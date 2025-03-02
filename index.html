@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Department Explorer | IGCSE Business Studies</title>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, #3498db, #1a5276);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* 3D Canvas */
+        #hr-office-canvas {
+            width: 100%;
+            height: 300px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .intro-text {
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+        
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-button {
+            background: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            color: #333;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab-button:before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            transition: width 0.3s ease;
+        }
+        
+        .tab-button:hover:before,
+        .tab-button.active:before {
+            width: 100%;
+        }
+        
+        .tab-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .tab-button.active {
+            background: #f0f8ff;
+            color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* HR Functions Grid */
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        .function-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            min-height: 250px;
+            margin-bottom: 2rem;
+        }
+        
+        .function-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .function-card .icon {
+            font-size: 2.5rem;
+            display: block;
+            text-align: center;
+            padding: 1.5rem 0;
+            color: white;
+        }
+        
+        .learning {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .exam-questions {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+        
+        .workforce-planning {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .function-card h3 {
+            text-align: center;
+            padding: 1rem;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        
+        .function-card p {
+            padding: 0 2rem 2rem;
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .get-started-btn {
+            display: block;
+            width: 80%;
+            max-width: 250px;
+            margin: 0 auto 2rem;
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+        
+        .get-started-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(90deg, #2980b9, #3498db);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+        }
+        
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        
+        /* Improved Loading Indicator */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #3498db, #2c3e50);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .spinner {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: white;
+            border-bottom-color: white;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .spinner:before, .spinner:after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 4px solid transparent;
+        }
+
+        .spinner:before {
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border-top-color: #2ecc71;
+            border-bottom-color: #2ecc71;
+            animation: spin 2s linear infinite;
+        }
+
+        .spinner:after {
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border-top-color: #f1c40f;
+            border-bottom-color: #f1c40f;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {transform: rotate(0deg);}
+            100% {transform: rotate(360deg);}
+        }
+    </style>
+</head>
+<body>
+    <!-- Improved Loading Indicator -->
+    <div class="loading" id="loading">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading HR Explorer...</div>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <header>
+        <h1>Human Resources Department</h1>
+        <p class="subtitle">Interactive Learning Portal for IGCSE Business Studies</p>
+    </header>
+    
+    <!-- 3D Office Visualization -->
+    <div id="hr-office-canvas"></div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <p class="intro-text fade-in">
+            Welcome to the Human Resources (HR) Department Explorer! This interactive portal will help you understand 
+            the key functions of HR and prepare you for your IGCSE Business Studies exams.
+        </p>
+        
+        <!-- Tab Navigation -->
+        <div class="tab-navigation fade-in delay-1">
+            <button class="tab-button active" onclick="switchTab('learning')">Learning</button>
+            <button class="tab-button" onclick="switchTab('exam-questions')">Exam Question Guide</button>
+            <button class="tab-button" onclick="switchTab('workforce-planning')">Interactive Workforce Planning</button>
+        </div>
+        
+        <!-- Tab Contents -->
+        <div id="learning" class="tab-content active">
+            <div class="function-card fade-in delay-2">
+                <div class="icon learning">📚</div>
+                <h3>HR Department Learning</h3>
+                <p>
+                    Explore the key functions of Human Resources including training and development, 
+                    dismissal and redundancy procedures, and industrial relations. Learn about the 
+                    advantages and disadvantages of each approach with clear, concise explanations.
+                </p>
+                <a href="learning.html" class="get-started-btn">Start Learning</a>
+            </div>
+        </div>
+        
+        <div id="exam-questions" class="tab-content">
+            <div class="function-card fade-in delay-2">
+                <div class="icon exam-questions">📝</div>
+                <h3>Exam Question Techniques</h3>
+                <p>
+                    Master different types of IGCSE Business Studies questions with our comprehensive guide. 
+                    Learn exactly what to include for 1-mark outline questions, explain questions, justify questions, 
+                    and analysis questions. Understand the marking criteria and how to maximize your scores.
+                </p>
+                <a href="exam-questions.html" class="get-started-btn">Improve Your Exam Skills</a>
+            </div>
+        </div>
+        
+        <div id="workforce-planning" class="tab-content">
+            <div class="function-card fade-in delay-2">
+                <div class="icon workforce-planning">🎮</div>
+                <h3>Interactive Workforce Planning Game</h3>
+                <p>
+                    Take part in an exciting workforce planning simulation where you'll make hiring decisions 
+                    in a realistic business scenario. Each participant will be assigned a role with a specific salary, 
+                    and you'll need to make strategic decisions to maximize your budget. The player with the most 
+                    money left while meeting business needs wins!
+                </p>
+                <a href="workforce-planning.html" class="get-started-btn">Play the Game</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 HR Department Explorer | IGCSE Business Studies</p>
+    </footer>
+    
+    <script>
+        // Wait for page to load
+        window.addEventListener('load', function() {
+            // Hide loading screen after delay
+            setTimeout(function() {
+                document.getElementById('loading').style.opacity = '0';
+                setTimeout(function() {
+                    document.getElementById('loading').style.display = 'none';
+                }, 500);
+            }, 1500);
+            
+            // Initialize Three.js scene
+            initHROffice();
+        });
+        
+        // Tab switching function
+        function switchTab(tabId) {
+            // Hide all tabs
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Deactivate all buttons
+            const tabButtons = document.getElementsByClassName('tab-button');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Find and activate the correct button
+            const buttons = document.getElementsByClassName('tab-button');
+            for (let i = 0; i < buttons.length; i++) {
+                if (buttons[i].textContent.toLowerCase().includes(tabId.replace('-', ' '))) {
+                    buttons[i].classList.add('active');
+                }
+            }
+        }
+        
+        // Navigation function
+        function navigateTo(url) {
+            // Show loading screen
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('loading').style.opacity = '1';
+            
+            // Navigate after short delay
+            setTimeout(function() {
+                window.location.href = url;
+            }, 500);
+        }
+        
+        // Three.js 3D Office Visualization
+        function initHROffice() {
+            // Canvas setup
+            const canvas = document.getElementById('hr-office-canvas');
+            
+            // Scene setup
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f8ff);
+            
+            // Camera setup
+            const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+            camera.position.z = 5;
+            camera.position.y = 1;
+            
+            // Renderer setup
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            canvas.appendChild(renderer.domElement);
+            
+            // Responsive canvas
+            window.addEventListener('resize', function() {
+                const width = canvas.clientWidth;
+                const height = canvas.clientHeight;
+                renderer.setSize(width, height);
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+            });
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 10, 7);
+            scene.add(directionalLight);
+            
+            // Create office floor
+            const floorGeometry = new THREE.PlaneGeometry(20, 20);
+            const floorMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xeeeeee,
+                roughness: 0.8
+            });
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.rotation.x = -Math.PI / 2;
+            floor.position.y = -1;
+            scene.add(floor);
+            
+            // Create modern office desk
+            const deskGeometry = new THREE.BoxGeometry(3, 0.1, 1.5);
+            const deskMaterial = new THREE.MeshStandardMaterial({ color: 0x607D8B });
+            const desk = new THREE.Mesh(deskGeometry, deskMaterial);
+            desk.position.set(0, -0.5, 0);
+            scene.add(desk);
+            
+            // Create modern computer screen
+            const screenStandGeometry = new THREE.BoxGeometry(0.1, 0.5, 0.1);
+            const screenStandMaterial = new THREE.MeshStandardMaterial({ color: 0x455A64 });
+            const screenStand = new THREE.Mesh(screenStandGeometry, screenStandMaterial);
+            screenStand.position.set(0, -0.2, -0.5);
+            scene.add(screenStand);
+            
+            const screenGeometry = new THREE.BoxGeometry(1.2, 0.7, 0.05);
+            const screenMaterial = new THREE.MeshStandardMaterial({ color: 0x263238 });
+            const screen = new THREE.Mesh(screenGeometry, screenMaterial);
+            screen.position.set(0, 0.2, -0.5);
+            scene.add(screen);
+            
+            // Create computer screen display
+            const displayGeometry = new THREE.PlaneGeometry(1.1, 0.6);
+            const displayMaterial = new THREE.MeshBasicMaterial({ color: 0x3498db });
+            const display = new THREE.Mesh(displayGeometry, displayMaterial);
+            display.position.set(0, 0.2, -0.47);
+            scene.add(display);
+            
+            // Create ergonomic chair
+            const chairBaseGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 16);
+            const chairMaterial = new THREE.MeshStandardMaterial({ color: 0x37474F });
+            const chairBase = new THREE.Mesh(chairBaseGeometry, chairMaterial);
+            chairBase.position.set(0, -0.8, 1);
+            scene.add(chairBase);
+            
+            const chairSeatGeometry = new THREE.BoxGeometry(1, 0.1, 1);
+            const chairSeatMaterial = new THREE.MeshStandardMaterial({ color: 0x546E7A });
+            const chairSeat = new THREE.Mesh(chairSeatGeometry, chairSeatMaterial);
+            chairSeat.position.set(0, -0.3, 1);
+            scene.add(chairSeat);
+            
+            const chairBackGeometry = new THREE.BoxGeometry(1, 1, 0.1);
+            const chairBack = new THREE.Mesh(chairBackGeometry, chairSeatMaterial);
+            chairBack.position.set(0, 0.2, 1.5);
+            scene.add(chairBack);
+            
+            // Create person figures representing HR staff (improved)
+            function createPerson(x, z, bodyColor, skinColor) {
+                const group = new THREE.Group();
+                
+                // Head
+                const headGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+                const headMaterial = new THREE.MeshStandardMaterial({ color: skinColor });
+                const head = new THREE.Mesh(headGeometry, headMaterial);
+                head.position.y = 0.7;
+                group.add(head);
+                
+                // Body
+                const bodyGeometry = new THREE.CylinderGeometry(0.2, 0.3, 0.7, 8);
+                const bodyMaterial = new THREE.MeshStandardMaterial({ color: bodyColor });
+                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                body.position.y = 0.15;
+                group.add(body);
+                
+                // Arms
+                const armGeometry = new THREE.CylinderGeometry(0.06, 0.06, 0.5, 8);
+                const armMaterial = new THREE.MeshStandardMaterial({ color: bodyColor });
+                
+                const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+                leftArm.position.set(-0.3, 0.3, 0);
+                leftArm.rotation.z = Math.PI / 3;
+                group.add(leftArm);
+                
+                const rightArm = new THREE.Mesh(armGeometry, armMaterial);
+                rightArm.position.set(0.3, 0.3, 0);
+                rightArm.rotation.z = -Math.PI / 3;
+                group.add(rightArm);
+                
+                // Legs
+                const legGeometry = new THREE.CylinderGeometry(0.08, 0.08, 0.5, 8);
+                const legMaterial = new THREE.MeshStandardMaterial({ color: 0x2c3e50 });
+                
+                const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+                leftLeg.position.set(-0.15, -0.35, 0);
+                group.add(leftLeg);
+                
+                const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+                rightLeg.position.set(0.15, -0.35, 0);
+                group.add(rightLeg);
+                
+                group.position.set(x, -0.5, z);
+                return group;
+            }
+            
+            // Add HR staff with diverse appearances
+            const hrPerson1 = createPerson(-2, 0, 0x3498db, 0xffdbac);
+            scene.add(hrPerson1);
+            
+            const hrPerson2 = createPerson(2, -1, 0xe74c3c, 0xdbb68f);
+            scene.add(hrPerson2);
+            
+            const hrPerson3 = createPerson(1.5, 0.5, 0x2ecc71, 0xf1c27d);
+            scene.add(hrPerson3);
+            
+            // Add floating icons representing HR functions (improved animation)
+            function createIcon(x, y, z, size, color) {
+                const iconGeometry = new THREE.SphereGeometry(size, 16, 16);
+                const iconMaterial = new THREE.MeshStandardMaterial({ 
+                    color: color,
+                    emissive: color,
+                    emissiveIntensity: 0.5,
+                    metalness: 0.3,
+                    roughness: 0.2
+                });
+                const icon = new THREE.Mesh(iconGeometry, iconMaterial);
+                icon.position.set(x, y, z);
+                
+                // Animation properties
+                icon.userData = {
+                    originalY: y,
+                    floatSpeed: 0.005 + Math.random() * 0.005,
+                    floatRange: 0.1 + Math.random() * 0.1,
+                    floatOffset: Math.random() * Math.PI * 2,
+                    rotationSpeed: 0.01 + Math.random() * 0.01
+                };
+                
+                return icon;
+            }
+            
+            // Create HR function icons - one for each tab
+            const learningIcon = createIcon(-2, 1.2, -1, 0.2, 0x3498db);
+            const examIcon = createIcon(0, 1.4, -1.2, 0.2, 0x2ecc71);
+            const planningIcon = createIcon(2, 1.2, -1, 0.2, 0xe74c3c);
+            
+            scene.add(learningIcon, examIcon, planningIcon);
+            
+            // Animate the scene
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Rotate camera slightly to create dynamic view
+                camera.position.x = Math.sin(Date.now() * 0.0003) * 2;
+                camera.lookAt(0, 0, 0);
+                
+                // Animate floating icons
+                const icons = [learningIcon, examIcon, planningIcon];
+                
+                icons.forEach(icon => {
+                    const data = icon.userData;
+                    // Floating animation
+                    icon.position.y = data.originalY + 
+                                     Math.sin(Date.now() * data.floatSpeed + data.floatOffset) * 
+                                     data.floatRange;
+                    
+                    // Rotation animation
+                    icon.rotation.y += data.rotationSpeed;
+                    icon.rotation.x += data.rotationSpeed / 2;
+                });
+                
+                // Animate people slightly to make scene more alive
+                hrPerson1.rotation.y = Math.sin(Date.now() * 0.001) * 0.2;
+                hrPerson2.rotation.y = Math.sin(Date.now() * 0.0008 + 1) * 0.2;
+                hrPerson3.rotation.y = Math.sin(Date.now() * 0.0012 + 2) * 0.2;
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+        }
+    </script>
+</body>
+</html>
