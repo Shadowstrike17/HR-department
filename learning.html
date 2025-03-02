@@ -3,778 +3,592 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Department Learning | IGCSE Business Studies</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>IGCSE Business Studies Flashcards</title>
     <style>
-        /* Global Styles */
+        :root {
+            --primary-color: #2e3192;
+            --secondary-color: #1a1c40;
+            --accent-color: #5053c7;
+            --text-color: #ffffff;
+            --card-bg: #ffffff;
+            --card-text: #333333;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
         }
         
         body {
-            background-color: #f5f7fa;
-            color: #333;
-            overflow-x: hidden;
-        }
-        
-        /* Header Styles */
-        header {
-            background: linear-gradient(135deg, #3498db, #1a5276);
-            color: white;
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            position: relative;
-            z-index: 10;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.95;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        /* Main Content */
-        .main-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        .intro-text {
-            text-align: center;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-            font-size: 1.1rem;
-        }
-        
-        /* Learning Navigation */
-        .learning-navigation {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
-            margin-bottom: 2rem;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        
-        .learning-button {
-            background: white;
-            border: none;
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 30px;
-            cursor: pointer;
-            color: #333;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-color);
             position: relative;
             overflow: hidden;
         }
         
-        .learning-button:before {
-            content: '';
+        .stars {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0%;
-            height: 4px;
-            background: linear-gradient(90deg, #3498db, #2ecc71);
-            transition: width 0.3s ease;
-        }
-        
-        .learning-button:hover:before,
-        .learning-button.active:before {
             width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
         }
         
-        .learning-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        .star {
+            position: absolute;
+            background-color: #fff;
+            border-radius: 50%;
+            opacity: 0.3;
         }
         
-        .learning-button.active {
-            background: #f0f8ff;
-            color: #2980b9;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-        }
-        
-        /* Flashcard Section */
-        .flashcard-section {
-            display: none;
-            opacity: 0;
-            transition: all 0.5s ease;
-        }
-        
-        .flashcard-section.active {
-            display: block;
-            opacity: 1;
-        }
-        
-        .flashcard-container {
+        header {
+            width: 100%;
+            padding: 20px;
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .logo {
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo span {
+            margin-left: 8px;
+        }
+        
+        .app-title {
+            text-align: center;
+            margin: 10px 0 30px;
+            z-index: 10;
+        }
+        
+        .app-title h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .app-title p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            width: 90%;
+            max-width: 600px;
+            margin-bottom: 20px;
+            z-index: 10;
+        }
+        
+        .controls button, .category-selector {
+            background-color: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: background-color 0.3s;
+        }
+        
+        .controls button:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+        
+        .category-selector {
+            padding: 8px 15px;
+        }
+        
+        .category-selector select {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            outline: none;
+        }
+        
+        .category-selector select option {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .card-container {
+            width: 90%;
+            max-width: 600px;
+            height: 400px;
+            perspective: 1000px;
+            z-index: 10;
+            margin-bottom: 30px;
         }
         
         .flashcard {
-            width: 350px;
-            height: 220px;
-            perspective: 1000px;
-            margin-bottom: 2rem;
-        }
-        
-        .flashcard-inner {
-            position: relative;
             width: 100%;
             height: 100%;
-            text-align: center;
-            transition: transform 0.8s;
+            position: relative;
             transform-style: preserve-3d;
-            cursor: pointer;
+            transition: transform 0.8s;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         
-        .flashcard:hover .flashcard-inner {
-            transform: translateY(-5px);
-        }
-        
-        .flashcard.flip .flashcard-inner {
+        .flashcard.flipped {
             transform: rotateY(180deg);
         }
         
-        .flashcard-front, .flashcard-back {
+        .front, .back {
             position: absolute;
             width: 100%;
             height: 100%;
-            -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 1.5rem;
+            padding: 30px;
+            border-radius: 20px;
+            background-color: var(--card-bg);
+            color: var(--card-text);
         }
         
-        .flashcard-front {
-            background: white;
-        }
-        
-        .flashcard-back {
-            background: white;
+        .back {
             transform: rotateY(180deg);
             overflow-y: auto;
+        }
+        
+        .card-number {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: rgba(0,0,0,0.3);
+        }
+        
+        .card-category {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+        
+        .card-content {
+            text-align: center;
+            font-size: 1.5rem;
+            max-width: 100%;
+        }
+        
+        .back .card-content {
+            font-size: 1.2rem;
+            line-height: 1.5;
             text-align: left;
         }
         
-        .flashcard-icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-        
-        .flashcard-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-        
-        .flashcard-content {
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-        
-        .flashcard-front .flashcard-content {
-            font-weight: 600;
-        }
-        
-        .definition-card .flashcard-front {
-            border-top: 5px solid #3498db;
-        }
-        
-        .advantages-card .flashcard-front {
-            border-top: 5px solid #2ecc71;
-        }
-        
-        .exam-card .flashcard-front {
-            border-top: 5px solid #f1c40f;
-        }
-        
-        .flip-instruction {
-            position: absolute;
-            bottom: 10px;
-            font-size: 0.8rem;
-            color: #7f8c8d;
-            width: 100%;
-            text-align: center;
-        }
-        
-        /* Progress Bar */
         .progress-container {
-            width: 100%;
-            margin: 2rem auto;
-            max-width: 800px;
+            width: 90%;
+            max-width: 600px;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            z-index: 10;
         }
         
         .progress-bar {
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .progress {
             height: 100%;
-            background: linear-gradient(90deg, #3498db, #2ecc71);
-            width: 0%;
-            transition: width 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.8);
+            transition: width 0.3s;
         }
         
-        .progress-text {
-            text-align: center;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        /* Navigation Buttons */
-        .nav-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-        
-        .nav-btn {
-            padding: 0.8rem 1.5rem;
-            background: white;
-            color: #333;
-            border: none;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .nav-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-        }
-        
-        .nav-btn.primary {
-            background: linear-gradient(90deg, #3498db, #2980b9);
-            color: white;
-        }
-        
-        /* Back to Home Button */
-        .back-home {
-            display: inline-block;
-            padding: 0.8rem 1.5rem;
-            background: #34495e;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 2rem auto;
-            text-decoration: none;
-            text-align: center;
-        }
-        
-        .back-home:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Streak Counter */
-        .streak-counter {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin: 1rem auto;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        .streak-icon {
-            color: #f39c12;
-        }
-        
-        /* Quiz Section */
-        .quiz-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .quiz-question {
-            font-size: 1.2rem;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-        }
-        
-        .quiz-marks {
-            font-size: 0.9rem;
-            color: #e74c3c;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-        
-        .quiz-answer-btn {
-            display: block;
-            width: 100%;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            background: #f0f8ff;
-            border: 1px solid #bdc3c7;
-            border-radius: 10px;
-            text-align: left;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .quiz-answer-btn:hover {
-            background: #e9f5ff;
-            transform: translateY(-2px);
-        }
-        
-        .quiz-answer-btn.correct {
-            background: #d5f5e3;
-            border-color: #2ecc71;
-        }
-        
-        .quiz-answer-btn.incorrect {
-            background: #fadbd8;
-            border-color: #e74c3c;
-        }
-        
-        .quiz-feedback {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            border-radius: 10px;
-            display: none;
-        }
-        
-        .quiz-feedback.correct {
-            background: #d5f5e3;
-            border-left: 5px solid #2ecc71;
-        }
-        
-        .quiz-feedback.incorrect {
-            background: #fadbd8;
-            border-left: 5px solid #e74c3c;
-        }
-        
-        .quiz-explanation {
-            margin-top: 0.5rem;
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-        
-        /* Timer */
-        .timer-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        
-        .timer {
-            padding: 0.5rem 1rem;
-            background: #2c3e50;
-            color: white;
-            border-radius: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .timer-icon {
-            color: #f1c40f;
-        }
-        
-        /* Footer */
-        footer {
-            background-color: #2c3e50;
-            color: white;
-            text-align: center;
-            padding: 1.5rem;
-            margin-top: 2rem;
-        }
-        
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.8s ease forwards;
-            opacity: 0;
-        }
-        
-        .delay-1 { animation-delay: 0.2s; }
-        .delay-2 { animation-delay: 0.4s; }
-        .delay-3 { animation-delay: 0.6s; }
-        
-        /* Loading Screen */
-        .loading {
+        .sidebar {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, #3498db, #2c3e50);
+            width: 60px;
+            background-color: rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 100px;
+            z-index: 20;
+        }
+        
+        .sidebar-btn {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-        
-        .loading-content {
-            text-align: center;
+            background-color: transparent;
+            border: none;
             color: white;
+            opacity: 0.6;
+            cursor: pointer;
+            transition: opacity 0.3s;
         }
         
-        .loading-text {
-            margin-top: 20px;
-            font-size: 1.5rem;
-            font-weight: 300;
-            letter-spacing: 1px;
+        .sidebar-btn:hover {
+            opacity: 1;
         }
         
-        .spinner {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto;
-            border-radius: 50%;
-            border: 4px solid transparent;
-            border-top-color: white;
-            border-bottom-color: white;
-            animation: spin 1.5s linear infinite;
+        /* Icons */
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            stroke-width: 0;
+            stroke: currentColor;
+            fill: currentColor;
         }
         
-        .spinner:before, .spinner:after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            border: 4px solid transparent;
-        }
-        
-        .spinner:before {
-            top: 5px;
-            left: 5px;
-            right: 5px;
-            bottom: 5px;
-            border-top-color: #2ecc71;
-            border-bottom-color: #2ecc71;
-            animation: spin 2s linear infinite;
-        }
-        
-        .spinner:after {
-            top: 15px;
-            left: 15px;
-            right: 15px;
-            bottom: 15px;
-            border-top-color: #f1c40f;
-            border-bottom-color: #f1c40f;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% {transform: rotate(0deg);}
-            100% {transform: rotate(360deg);}
+        @media (max-width: 768px) {
+            .app-title h1 {
+                font-size: 2rem;
+            }
+            
+            .card-container {
+                height: 300px;
+            }
+            
+            .card-content {
+                font-size: 1.3rem;
+            }
+            
+            .back .card-content {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div class="loading" id="loading">
-        <div class="loading-content">
-            <div class="spinner"></div>
-            <div class="loading-text">Loading HR Learning Module...</div>
-        </div>
+    <div class="stars" id="stars"></div>
+    
+    <div class="sidebar">
+        <button class="sidebar-btn">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M3 13h18c0.552 0 1-0.448 1-1s-0.448-1-1-1h-18c-0.552 0-1 0.448-1 1s0.448 1 1 1zM3 7h18c0.552 0 1-0.448 1-1s-0.448-1-1-1h-18c-0.552 0-1 0.448-1 1s0.448 1 1 1zM3 19h18c0.552 0 1-0.448 1-1s-0.448-1-1-1h-18c-0.552 0-1 0.448-1 1s0.448 1 1 1z"></path>
+            </svg>
+        </button>
+        <button class="sidebar-btn">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M12 1c-6.338 0-12 4.226-12 10.007 0 2.05.739 4.063 2.047 5.625.055 1.83-1.023 4.456-1.993 6.368 2.602-.47 6.301-1.508 7.978-2.536 1.417.345 2.774.503 4.059.503 7.084 0 11.91-4.837 11.91-9.961-.001-5.811-5.702-10.006-12.001-10.006zm0 15c-.565 0-1.024-.459-1.024-1.025 0-.565.459-1.024 1.024-1.024.566 0 1.024.459 1.024 1.024 0 .566-.458 1.025-1.024 1.025zm1.606-4.858c-.74.799-.775 1.241-.766 1.785h-1.643c-.006-1.208.016-1.742 1.173-2.842.469-.446.84-.799.788-1.493-.047-.66-.599-1.004-1.117-1.004-.581 0-1.261.432-1.261 1.649h-1.646c0-1.966 1.155-3.237 2.941-3.237.849 0 1.592.278 2.09.783.468.473.709 1.125.7 1.883-.013 1.105-.485 1.756-1.259 2.476z"></path>
+            </svg>
+        </button>
+        <button class="sidebar-btn">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M12 5c3.453 0 5.891 2.797 5.567 6.78 1.745-.046 4.433.751 4.433 3.72 0 1.93-1.57 3.5-3.5 3.5h-13c-1.93 0-3.5-1.57-3.5-3.5 0-2.797 2.479-3.833 4.433-3.72-.167-4.218 2.208-6.78 5.567-6.78zm0-2c-4.006 0-7.267 3.141-7.479 7.092-2.57.463-4.521 2.706-4.521 5.408 0 3.037 2.463 5.5 5.5 5.5h13c3.037 0 5.5-2.463 5.5-5.5 0-2.702-1.951-4.945-4.521-5.408-.212-3.951-3.473-7.092-7.479-7.092z"></path>
+            </svg>
+        </button>
+        <button class="sidebar-btn">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M24 13.616v-3.232c-1.651-.587-2.694-.752-3.219-2.019v-.001c-.527-1.271.1-2.134.847-3.707l-2.285-2.285c-1.561.742-2.433 1.375-3.707.847h-.001c-1.269-.526-1.435-1.576-2.019-3.219h-3.232c-.582 1.635-.749 2.692-2.019 3.219h-.001c-1.271.528-2.132-.098-3.707-.847l-2.285 2.285c.745 1.568 1.375 2.434.847 3.707-.527 1.271-1.584 1.438-3.219 2.02v3.232c1.632.58 2.692.749 3.219 2.019.53 1.282-.114 2.166-.847 3.707l2.285 2.286c1.562-.743 2.434-1.375 3.707-.847h.001c1.27.526 1.436 1.579 2.019 3.219h3.232c.582-1.636.75-2.69 2.027-3.222h.001c1.262-.524 2.12.101 3.698.851l2.285-2.286c-.744-1.563-1.375-2.433-.848-3.706.527-1.271 1.588-1.44 3.221-2.021zm-12 2.384c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z"></path>
+            </svg>
+        </button>
     </div>
-
-    <!-- Header Section -->
+    
     <header>
-        <h1>HR Department Learning</h1>
-        <p class="subtitle">Master Key Concepts with Interactive Flashcards</p>
+        <div class="logo">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M5 7c-1.105 0-2 .896-2 2v6c0 1.104.895 2 2 2h14c1.105 0 2-.896 2-2v-6c0-1.104-.895-2-2-2h-14zm17 3v-3h2v3h-2zm0 7v3h-20v-3h20zm0-14v3h-20v-3h20z"></path>
+            </svg>
+            <span>iGCSE Business</span>
+        </div>
+        <button class="mode-toggle">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M12 10.999c1.437.438 2.562 1.564 2.999 3.001.44-1.437 1.565-2.562 3.001-3-1.436-.439-2.561-1.563-3.001-3-.437 1.436-1.562 2.561-2.999 2.999zm8.001.001c.958.293 1.707 1.042 2 2.001.291-.959 1.042-1.709 1.999-2.001-.957-.292-1.707-1.042-2-2-.293.958-1.042 1.708-1.999 2zm-1-9c-.437 1.437-1.563 2.562-2.998 3.001 1.438.44 2.561 1.564 3.001 3.002.437-1.438 1.563-2.563 2.996-3.002-1.433-.437-2.559-1.564-2.999-3.001zm-7.001 22c-6.617 0-12-5.383-12-12s5.383-12 12-12c1.894 0 3.63.497 5.37 1.179-2.948.504-9.37 3.266-9.37 10.821 0 7.454 5.917 10.208 9.37 10.821-1.5.846-3.476 1.179-5.37 1.179z"></path>
+            </svg>
+        </button>
     </header>
     
-    <!-- Main Content -->
-    <div class="main-content">
-        <p class="intro-text fade-in">
-            Welcome to the HR Department Learning Module! This interactive learning system will help you 
-            understand the key functions and concepts of Human Resources management. Flip through flashcards, 
-            test your knowledge, and prepare for your IGCSE Business Studies exams.
-        </p>
-        
-        <!-- Learning Navigation -->
-        <div class="learning-navigation fade-in delay-1">
-            <button class="learning-button active" onclick="switchSection('key-concepts')">Key HR Concepts</button>
-            <button class="learning-button" onclick="switchSection('exam-strategies')">Exam Question Strategies</button>
-            <button class="learning-button" onclick="switchSection('practice-quiz')">Practice Quiz</button>
-        </div>
-        
-        <!-- Progress Bar -->
-        <div class="progress-container fade-in delay-1">
-            <div class="progress-bar">
-                <div class="progress" id="progress-bar"></div>
+    <div class="app-title">
+        <h1>Flash Cards</h1>
+        <p>Human Resources Department</p>
+    </div>
+    
+    <div class="category-selector">
+        <select id="category-select">
+            <option value="all">All Categories</option>
+            <option value="Definitions">Key Terms</option>
+            <option value="Functions">HR Functions</option>
+            <option value="Exam">Exam Questions</option>
+        </select>
+    </div>
+    
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    
+    <div class="card-container">
+        <div class="flashcard" id="flashcard">
+            <div class="front">
+                <div class="card-number" id="card-number">1/15</div>
+                <div class="card-category" id="front-category">Definitions</div>
+                <div class="card-content" id="front-content">What is the human resources department responsible for?</div>
             </div>
-            <p class="progress-text">Your progress: <span id="progress-text">0%</span></p>
+            <div class="back">
+                <div class="card-number" id="back-card-number">1/15</div>
+                <div class="card-category" id="back-category">Definitions</div>
+                <div class="card-content" id="back-content">The human resources (or personnel) department is responsible for the welfare of employees, including workforce planning, recruitment and selection, training, health and safety, staff welfare, employment issues, industrial relations, disciplinary procedures, dismissal, and redundancy.</div>
+            </div>
         </div>
+    </div>
+    
+    <div class="controls">
+        <button id="prev-btn">Previous</button>
+        <button id="flip-btn">Flip Card</button>
+        <button id="next-btn">Next</button>
+    </div>
+    
+    <script>
+        // Create stars for background
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = `${Math.random() * 3}px`;
+            star.style.height = star.style.width;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 10}s`;
+            starsContainer.appendChild(star);
+        }
         
-        <!-- Streak Counter -->
-        <div class="streak-counter fade-in delay-1">
-            <span class="streak-icon">🔥</span>
-            <span id="streak-count">0</span>
-            <span>card streak</span>
-        </div>
+        // Flashcard data from the textbook
+        const flashcards = [
+            {
+                id: 1,
+                category: "Definitions",
+                question: "What is the human resources department responsible for?",
+                answer: "The human resources (or personnel) department is responsible for the welfare of employees, including workforce planning, recruitment and selection, training, health and safety, staff welfare, employment issues, industrial relations, disciplinary procedures, dismissal, and redundancy."
+            },
+            {
+                id: 2,
+                category: "Definitions",
+                question: "What is workforce planning?",
+                answer: "Workforce planning involves calculating the number and types of staff that will be required by the business. If a business is short of particular types of staff, it may not be able to meet customer orders."
+            },
+            {
+                id: 3,
+                category: "Definitions",
+                question: "What is a contract of employment?",
+                answer: "A written agreement between an employer and an employee in which each has certain obligations. The HR Department draws up these contracts, explains the contents, and ensures that both the employer and the employee sign copies."
+            },
+            {
+                id: 4,
+                category: "Definitions",
+                question: "What is unfair dismissal?",
+                answer: "When a worker is dismissed illegally by a business. For example, if a worker is dismissed for joining a trade union or because they are considered too old, they may take their employer to an employment tribunal where the case will be heard."
+            },
+            {
+                id: 5,
+                category: "Definitions",
+                question: "What is an employment tribunal?",
+                answer: "A court that deals with cases involving disputes between employers and employees. If an employee claims unfair dismissal, the case will be heard at an employment tribunal."
+            },
+            {
+                id: 6,
+                category: "Functions",
+                question: "What are the main responsibilities of HR in recruitment and selection?",
+                answer: "The HR department helps plan the numbers and types of workers needed, places job adverts, and provides application forms. The selection of appropriate candidates for interview, interviewing of candidates, and selection of the best employees for the job may also be carried out by HR, or by the managers in the departments they will join."
+            },
+            {
+                id: 7,
+                category: "Functions",
+                question: "How does the HR department handle training responsibilities?",
+                answer: "The HR department is likely to organize induction training for new employees and most other training that employees will need during their employment to develop their skills and knowledge."
+            },
+            {
+                id: 8,
+                category: "Functions",
+                question: "What are the health and safety responsibilities of the HR department?",
+                answer: "Businesses have to comply with health and safety legislation, which is designed to protect employees from dangers in the workplace. The HR department ensures staff are fully trained in health and safety and issues all employees with the required safety equipment and protective clothing."
+            },
+            {
+                id: 9,
+                category: "Functions",
+                question: "What is the role of HR in staff welfare?",
+                answer: "The HR department is responsible for meeting the welfare needs of employees. They monitor the working environment to ensure it is comfortable. They must provide toilets, washing facilities, fresh drinking water, and somewhere clean, hygienic and comfortable for breaks, as well as means of heating food or water for hot drinks."
+            },
+            {
+                id: 10,
+                category: "Functions",
+                question: "How does the HR department handle employment issues?",
+                answer: "The HR Department draws up contracts of employment, explains the contents, and ensures that both the employer and employee sign copies. It clarifies pay, hours and place of work, job descriptions, holiday allowances, non-financial incentives, and any other conditions of service for new employees."
+            },
+            {
+                id: 11,
+                category: "Functions",
+                question: "What is the HR department's role in industrial relations?",
+                answer: "The HR department maintains good communications with trade unions. They may also organize and be involved in negotiations between employers and employees."
+            },
+            {
+                id: 12,
+                category: "Functions",
+                question: "How does the HR department handle dismissal?",
+                answer: "The HR department is responsible for giving formal warnings to workers and dealing with any legal requirements when laying off staff. If an employee claims unfair dismissal, the HR department would be involved in the process if the case goes to an employment tribunal."
+            },
+            {
+                id: 13,
+                category: "Functions",
+                question: "What is the HR department's role in handling redundancy?",
+                answer: "If a business has to make people redundant, a strict formal procedure has to be followed before they can be laid off. For example, employees must be given written notice and may be entitled to redundancy pay. The HR department handles this process."
+            },
+            {
+                id: 14,
+                category: "Exam",
+                question: "Outline two responsibilities of the HR department related to health and safety. (2 marks)",
+                answer: "1. The HR department must ensure staff are fully trained in health and safety procedures.\n\n2. The HR department must issue all employees with required safety equipment and protective clothing to comply with health and safety legislation."
+            },
+            {
+                id: 15,
+                category: "Exam",
+                question: "Explain one reason why workforce planning is important for a large business. (2 marks)",
+                answer: "Workforce planning is important because if a business is short of particular types of staff, it may not be able to meet customer orders (1 mark). This is especially critical in large businesses with thousands of employees, where proper planning ensures operational efficiency (1 mark)."
+            }
+        ];
         
-        <!-- Key Concepts Section -->
-        <div id="key-concepts" class="flashcard-section active">
-            <div class="flashcard-container">
-                <!-- Definition Cards -->
-                <div class="flashcard definition-card fade-in delay-2" onclick="flipCard(this)">
-                    <div class="flashcard-inner">
-                        <div class="flashcard-front">
-                            <div class="flashcard-icon">📚</div>
-                            <div class="flashcard-title">Definition</div>
-                            <div class="flashcard-content">What is Workforce Planning?</div>
-                            <div class="flip-instruction">Click to flip</div>
-                        </div>
-                        <div class="flashcard-back">
-                            <div class="flashcard-title">Workforce Planning</div>
-                            <div class="flashcard-content">
-                                <p>Workforce planning involves calculating the number and types of staff that will be required by a business. This includes:</p>
-                                <ul style="margin-left: 1rem; margin-top: 0.5rem;">
-                                    <li>Forecasting future staffing needs</li>
-                                    <li>Determining skills and qualifications required</li>
-                                    <li>Planning for recruitment or redundancy</li>
-                                    <li>Ensuring the right staff are available at the right time</li>
-                                </ul>
-                                <p style="margin-top: 0.5rem;">In small businesses, this process is less complex, but for large organizations employing thousands, effective workforce planning is crucial to meet customer demands.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flashcard definition-card fade-in delay-2" onclick="flipCard(this)">
-                    <div class="flashcard-inner">
-                        <div class="flashcard-front">
-                            <div class="flashcard-icon">📚</div>
-                            <div class="flashcard-title">Definition</div>
-                            <div class="flashcard-content">What is Recruitment and Selection?</div>
-                            <div class="flip-instruction">Click to flip</div>
-                        </div>
-                        <div class="flashcard-back">
-                            <div class="flashcard-title">Recruitment and Selection</div>
-                            <div class="flashcard-content">
-                                <p>Recruitment and selection is the process of finding and hiring the best qualified candidate for a job vacancy. This typically involves:</p>
-                                <ul style="margin-left: 1rem; margin-top: 0.5rem;">
-                                    <li>Planning workforce needs</li>
-                                    <li>Creating and placing job advertisements</li>
-                                    <li>Providing application forms</li>
-                                    <li>Selecting appropriate candidates for interview</li>
-                                    <li>Conducting interviews</li>
-                                    <li>Selecting the best employees for the position</li>
-                                </ul>
-                                <p style="margin-top: 0.5rem;">The HR department typically manages this process, though final selection may involve managers from the departments where new employees will work.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flashcard definition-card fade-in delay-2" onclick="flipCard(this)">
-                    <div class="flashcard-inner">
-                        <div class="flashcard-front">
-                            <div class="flashcard-icon">📚</div>
-                            <div class="flashcard-title">Definition</div>
-                            <div class="flashcard-content">What is a Contract of Employment?</div>
-                            <div class="flip-instruction">Click to flip</div>
-                        </div>
-                        <div class="flashcard-back">
-                            <div class="flashcard-title">Contract of Employment</div>
-                            <div class="flashcard-content">
-                                <p>A contract of employment is a written agreement between an employer and an employee that establishes the rights and obligations of both parties. It typically includes:</p>
-                                <ul style="margin-left: 1rem; margin-top: 0.5rem;">
-                                    <li>Job title and description</li>
-                                    <li>Salary and payment terms</li>
-                                    <li>Working hours and location</li>
-                                    <li>Holiday entitlement</li>
-                                    <li>Sick leave provisions</li>
-                                    <li>Notice period</li>
-                                    <li>Disciplinary and grievance procedures</li>
-                                </ul>
-                                <p style="margin-top: 0.5rem;">The HR department is responsible for creating these contracts, explaining their content to new employees, and ensuring both parties sign copies.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Advantages/Disadvantages Cards -->
-                <div class="flashcard advantages-card fade-in delay-3" onclick="flipCard(this)">
-                    <div class="flashcard-inner">
-                        <div class="flashcard-front">
-                            <div class="flashcard-icon">🔄</div>
-                            <div class="flashcard-title">Advantages & Disadvantages</div>
-                            <div class="flashcard-content">Why is Training Important?</div>
-                            <div class="flip-instruction">Click to flip</div>
-                        </div>
-                        <div class="flashcard-back">
-                            <div class="flashcard-title">Importance of Training</div>
-                            <div class="flashcard-content">
-                                <p><strong>Advantages of Training:</strong></p>
-                                <ul style="margin-left: 1rem; margin-top: 0.5rem;">
-                                    <li>Improves employee skills and productivity</li>
-                                    <li>Increases employee confidence and job satisfaction</li>
-                                    <li>Helps adapt to new technologies and processes</li>
-                                    <li>Reduces employee turnover and recruitment costs</li>
-                                    <li>Ensures compliance with health and safety standards</li>
-                                </ul>
-                                <p style="margin-top: 0.5rem;"><strong>Disadvantages of Training:</strong></p>
-                                <ul style="margin-left: 1rem; margin-top: 0.5rem;">
-                                    <li>Can be expensive to implement</li>
-                                    <li>Requires time away from productive work</li>
-                                    <li>Trained employees may leave for better positions elsewhere</li>
-                                    <li>Training may not transfer effectively to workplace tasks</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flashcard advantages-card fade-in delay-3" onclick="flipCard(this)">
-                    <div class="flashcard-inner">
-                        <div class="flashcard-front">
-                            <div class="flashcard-icon">🔄</div>
-                            <div class="flashcard-title">Advantages & Disadvantages</div>
-                            <div class="flashcard-content">What are the Benefits and Drawbacks of Redundancy?</div>
-                            <div class="flip-instruction">Click to flip</div>
-                        </div>
-                        <div class="flashcard-back">
-                            <div class="flashcard-title">Redundancy: Benefits & Drawbacks</div>
-                            <div class="flashcard-content">
-                                <p><strong>Potential Benefits for a Business:</strong></p>
-                                <ul style="margin-left: 1rem; margin-top: 0.5rem;">
-                                    <li>Reduces wage costs in the long term</li>
-                                    <li>Can help a struggling business survive</li>
-                                    <li>Opportunity to restructure operations</li>
-                                    <li>May improve efficiency with fewer staff</li>
-                                </ul>
-                                <p style="margin-top: 0.5rem;"><strong>Drawbacks:</strong></p>
-                                <ul style="margin-left: 1rem; margin-top: 0.5rem;">
-                                    <li>High initial redundancy payment costs</li>
-                                    <li>Loss of skilled and experienced workers</li>
-                                    <li>Negative impact on staff morale</li>
-                                    <li>Potential damage to company reputation</li>
-                                    <li>Remaining staff may face increased workload</li>
-                                    <li>Possible legal challenges if procedures aren't followed correctly</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flashcard advantages-card fade-in delay-3" onclick="flipCard(this)">
-                    <div class="flashcard-inner">
-                        <div class="flashcard-front">
-                            <div class="flashcard-icon">🔄</div>
-                            <div class="flashcard-title">Advantages & Disadvantages</div>
-                            <div class="flashcard-content">Why is Health and Safety Important?</div>
-                            <div class="flip-instruction">Click to flip</div>
-                        </div>
-                        <div class="flashcard-back">
-                            <div class="flashcard-title">Health and Safety Importance</div>
-                            <div class="flashcard-content">
-                                <p><strong>Advantages of Good Health and Safety:</strong></p>
-                                <ul style="margin-left: 1rem; margin-top: 0.5rem;">
-                                    <li>Reduces workplace accidents and injuries</li>
-                                    <li>Decreases employee absence due to illness</li>
-                                    <li>Avoids potential legal penalties and compensation claims</li>
-                                    <li>Improves employee morale and productivity</li>
-                                    <li>Enhances company reputation with stakeholders</li>
-                                </ul>
-                                <p style="margin-top: 0.5rem;"><strong>Disadvantages/Challenges:</strong></p>
-                                <ul style="margin-left: 1rem; margin-top: 0.5rem;">
-                                    <li>Implementation costs for training and equipment</li>
-                                    <li>Time required for safety procedures</li>
-                                    <li>Ongoing monitoring and updates needed</li>
-                                    <li>Can create additional administrative burden</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Exam-Style Cards -->
-                <div class="flashcard exam-card fade-in delay-4" onclick="flipCard(this)">
-                    <div class="flashcard-inner">
-                        <div class="flashcard-front">
-                            <div class="flashcard-icon">📝</div>
-                            <div class="flashcard-title">Exam Application</div>
-                            <div class="flashcard-content">How might poor industrial relations affect a business?</div>
-                            <div class="flip-instruction">Click to flip</div>
-                        </div>
-                        <div class="flashcard-back">
-                            <div class="flashcard-title">Impact of Poor Industrial Relations</div>
-                            <div class="flashcard-content">
-                                <p>Poor industrial relations between management and employees/trade unions can have several significant impacts:</p>
-                                <ul style="margin-left: 1rem; margin-top: 0.5rem;">
-                                    <li><strong>Industrial action</strong> - strikes or work-to-rule can disrupt production and affect customer service</li>
-                                    <li><strong>Lower productivity</strong> - demotivated workers may reduce their effort or quality of work</li>
-                                    <li><strong>Higher staff turnover</strong> - employees may leave, increasing recruitment costs</li>
-                                    <li><strong>Negative publicity</strong> - disputes can damage the company's reputation</li>
-                                    <li><strong>Difficulty implementing change</strong> - resistance to new procedures or technologies</li>
-                                    <li><strong>Legal costs</strong> - potential expenses from employment tribunals or legal disputes</li>
-                                </ul>
-                                <p style="margin-top: 0.5rem;">A strong HR department plays a crucial role in maintaining positive industrial relations through effective communication, fair policies, and consistent handling of grievances.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flashcard exam-card fade-in delay-4" onclick="flipCard(this)">
-                    <div class="flashcard-inner">
-                        <div class="flashcard-front">
-                            <div class="flashcard-icon">📝</div>
-                            <div class="flashcard-title">Exam Application</div>
-                            <div class="flashcard-content">Explain the disciplinary procedure an HR department might follow.</div>
-                            <div class="flip-instruction">Click to flip</div>
-                        </div>
-                        <div class="flashcard-back">
-                            <div class="flashcard-title">Disciplinary Procedure</div>
-                            <div class="flashcard-content">
-                                <p>A typical disciplinary procedure managed by HR will follow these steps:</p>
-                                <ol style="margin-left: 1rem; margin-top: 0.5rem;">
-                                    <li><strong>Informal discussion</strong> - For minor issues, a manager may have an informal conversation with the employee</li>
-                                    <li><strong>Investigation</strong> - If the issue is serious or persists, HR will gather evidence and information</li>
-                                    <li><strong>Formal meeting</strong> - The employee is invited to a meeting with written notice and right to bring a representative</li>
-                                    <li><strong>Verbal warning</strong> - First formal stage, usually recorded but expires after a set period</li>
-                                    <li><strong>Written warning</strong> - More serious or repeated issues lead to formal written warnings</li>
-                                    <li><strong>Final written warning</strong> - For continued problems or serious misconduct</li>
-                                    <li><strong>Dismissal</strong> - The last resort for gross misconduct or continued failure to improve</li>
+        let currentIndex = 0;
+        let filteredCards = [...flashcards];
+        
+        // DOM elements
+        const flashcard = document.getElementById('flashcard');
+        const frontContent = document.getElementById('front-content');
+        const backContent = document.getElementById('back-content');
+        const frontCategory = document.getElementById('front-category');
+        const backCategory = document.getElementById('back-category');
+        const cardNumber = document.getElementById('card-number');
+        const backCardNumber = document.getElementById('back-card-number');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const flipBtn = document.getElementById('flip-btn');
+        const categorySelect = document.getElementById('category-select');
+        const progressBar = document.getElementById('progress-bar');
+        
+        // Flip card on click
+        flashcard.addEventListener('click', () => {
+            flashcard.classList.toggle('flipped');
+        });
+        
+        // Flip card with button
+        flipBtn.addEventListener('click', () => {
+            flashcard.classList.toggle('flipped');
+        });
+        
+        // Previous card
+        prevBtn.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCard();
+                updateProgress();
+            }
+        });
+        
+        // Next card
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < filteredCards.length - 1) {
+                currentIndex++;
+                updateCard();
+                updateProgress();
+            }
+        });
+        
+        // Filter cards by category
+        categorySelect.addEventListener('change', () => {
+            const category = categorySelect.value;
+            
+            if (category === 'all') {
+                filteredCards = [...flashcards];
+            } else {
+                filteredCards = flashcards.filter(card => card.category === category);
+            }
+            
+            currentIndex = 0;
+            updateCard();
+            updateProgress();
+        });
+        
+        // Update card content
+        function updateCard() {
+            // Reset flip state
+            flashcard.classList.remove('flipped');
+            
+            // Get current card
+            const card = filteredCards[currentIndex];
+            
+            // Update content
+            frontContent.textContent = card.question;
+            backContent.innerHTML = card.answer.replace(/\n\n/g, '<br><br>');
+            
+            // Update category
+            frontCategory.textContent = card.category;
+            backCategory.textContent = card.category;
+            
+            // Update card number
+            const cardNumberText = `${currentIndex + 1}/${filteredCards.length}`;
+            cardNumber.textContent = cardNumberText;
+            backCardNumber.textContent = cardNumberText;
+            
+            // Update button states
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === filteredCards.length - 1;
+        }
+        
+        // Update progress bar
+        function updateProgress() {
+            const progress = ((currentIndex + 1) / filteredCards.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        // Initialize
+        updateCard();
+        updateProgress();
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                currentIndex--;
+                updateCard();
+                updateProgress();
+            } else if (e.key === 'ArrowRight' && currentIndex < filteredCards.length - 1) {
+                currentIndex++;
+                updateCard();
+                updateProgress();
+            } else if (e.key === ' ' || e.key === 'Enter') {
+                flashcard.classList.toggle('flipped');
+            }
+        });
+        
+        // Animate stars
+        function animateStars() {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(star => {
+                star.style.opacity = Math.random() * 0.7 + 0.3;
+            });
+            setTimeout(animateStars, 1000);
+        }
+        
+        animateStars();
+    </script>
+</body>
+</html>
