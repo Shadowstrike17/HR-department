@@ -12,6 +12,7 @@
             --text-color: #ffffff;
             --card-bg: #ffffff;
             --card-text: #333333;
+            --highlight-color: #4c6ef5;
         }
         
         * {
@@ -252,6 +253,12 @@
             opacity: 1;
         }
         
+        /* Styling for highlighted keywords */
+        .keyword {
+            font-weight: bold;
+            color: var(--highlight-color);
+        }
+        
         /* Icons */
         .icon {
             display: inline-block;
@@ -329,9 +336,10 @@
     <div class="category-selector">
         <select id="category-select">
             <option value="all">All Categories</option>
-            <option value="Definitions">Key Terms</option>
-            <option value="Functions">HR Functions</option>
-            <option value="Exam">Exam Questions</option>
+            <option value="Core Definition">Core Definition</option>
+            <option value="Key Functions">Key Functions</option>
+            <option value="Legal Concepts">Legal Concepts</option>
+            <option value="Exam Practice">Exam Practice</option>
         </select>
     </div>
     
@@ -343,13 +351,13 @@
         <div class="flashcard" id="flashcard">
             <div class="front">
                 <div class="card-number" id="card-number">1/15</div>
-                <div class="card-category" id="front-category">Definitions</div>
-                <div class="card-content" id="front-content">What is the human resources department responsible for?</div>
+                <div class="card-category" id="front-category">Core Definition</div>
+                <div class="card-content" id="front-content">What is Human Resources?</div>
             </div>
             <div class="back">
                 <div class="card-number" id="back-card-number">1/15</div>
-                <div class="card-category" id="back-category">Definitions</div>
-                <div class="card-content" id="back-content">The human resources (or personnel) department is responsible for the welfare of employees, including workforce planning, recruitment and selection, training, health and safety, staff welfare, employment issues, industrial relations, disciplinary procedures, dismissal, and redundancy.</div>
+                <div class="card-category" id="back-category">Core Definition</div>
+                <div class="card-content" id="back-content">The Human Resources department is responsible for employee <span class="keyword">welfare</span>, <span class="keyword">workforce planning</span>, <span class="keyword">recruitment</span>, <span class="keyword">training</span>, <span class="keyword">health and safety</span>, and handling <span class="keyword">employment issues</span>.</div>
             </div>
         </div>
     </div>
@@ -374,97 +382,97 @@
             starsContainer.appendChild(star);
         }
         
-        // Flashcard data from the textbook
+        // Simplified HR Flashcards with highlighted keywords
         const flashcards = [
             {
                 id: 1,
-                category: "Definitions",
-                question: "What is the human resources department responsible for?",
-                answer: "The human resources (or personnel) department is responsible for the welfare of employees, including workforce planning, recruitment and selection, training, health and safety, staff welfare, employment issues, industrial relations, disciplinary procedures, dismissal, and redundancy."
+                category: "Core Definition",
+                question: "What is Human Resources?",
+                answer: "The Human Resources department is responsible for employee <span class=\"keyword\">welfare</span>, <span class=\"keyword\">workforce planning</span>, <span class=\"keyword\">recruitment</span>, <span class=\"keyword\">training</span>, <span class=\"keyword\">health and safety</span>, and handling <span class=\"keyword\">employment issues</span>."
             },
             {
                 id: 2,
-                category: "Definitions",
+                category: "Key Functions",
                 question: "What is workforce planning?",
-                answer: "Workforce planning involves calculating the number and types of staff that will be required by the business. If a business is short of particular types of staff, it may not be able to meet customer orders."
+                answer: "Calculating the <span class=\"keyword\">number and types of staff</span> needed to ensure the business can meet customer demands."
             },
             {
                 id: 3,
-                category: "Definitions",
-                question: "What is a contract of employment?",
-                answer: "A written agreement between an employer and an employee in which each has certain obligations. The HR Department draws up these contracts, explains the contents, and ensures that both the employer and the employee sign copies."
+                category: "Key Functions",
+                question: "What are HR's recruitment responsibilities?",
+                answer: "Planning workforce needs, placing <span class=\"keyword\">job advertisements</span>, providing <span class=\"keyword\">application forms</span>, conducting <span class=\"keyword\">interviews</span>, and selecting appropriate candidates."
             },
             {
                 id: 4,
-                category: "Definitions",
-                question: "What is unfair dismissal?",
-                answer: "When a worker is dismissed illegally by a business. For example, if a worker is dismissed for joining a trade union or because they are considered too old, they may take their employer to an employment tribunal where the case will be heard."
+                category: "Key Functions",
+                question: "How does HR handle training?",
+                answer: "Organizing <span class=\"keyword\">induction training</span> for new employees and developing employee <span class=\"keyword\">skills and knowledge</span>."
             },
             {
                 id: 5,
-                category: "Definitions",
-                question: "What is an employment tribunal?",
-                answer: "A court that deals with cases involving disputes between employers and employees. If an employee claims unfair dismissal, the case will be heard at an employment tribunal."
+                category: "Key Functions",
+                question: "What are HR's health and safety duties?",
+                answer: "Ensuring <span class=\"keyword\">compliance</span> with safety legislation, providing <span class=\"keyword\">safety training</span>, and issuing <span class=\"keyword\">protective equipment</span>."
             },
             {
                 id: 6,
-                category: "Functions",
-                question: "What are the main responsibilities of HR in recruitment and selection?",
-                answer: "The HR department helps plan the numbers and types of workers needed, places job adverts, and provides application forms. The selection of appropriate candidates for interview, interviewing of candidates, and selection of the best employees for the job may also be carried out by HR, or by the managers in the departments they will join."
+                category: "Key Functions",
+                question: "How does HR manage staff welfare?",
+                answer: "Maintaining a <span class=\"keyword\">comfortable working environment</span> and providing adequate <span class=\"keyword\">facilities</span> (toilets, drinking water, break areas)."
             },
             {
                 id: 7,
-                category: "Functions",
-                question: "How does the HR department handle training responsibilities?",
-                answer: "The HR department is likely to organize induction training for new employees and most other training that employees will need during their employment to develop their skills and knowledge."
+                category: "Key Functions",
+                question: "How does HR handle employment issues?",
+                answer: "Creating <span class=\"keyword\">contracts of employment</span> and clarifying <span class=\"keyword\">pay</span>, <span class=\"keyword\">hours</span>, <span class=\"keyword\">job descriptions</span> and <span class=\"keyword\">conditions</span>."
             },
             {
                 id: 8,
-                category: "Functions",
-                question: "What are the health and safety responsibilities of the HR department?",
-                answer: "Businesses have to comply with health and safety legislation, which is designed to protect employees from dangers in the workplace. The HR department ensures staff are fully trained in health and safety and issues all employees with the required safety equipment and protective clothing."
+                category: "Key Functions",
+                question: "What is HR's role in industrial relations?",
+                answer: "Maintaining communication with <span class=\"keyword\">trade unions</span> and organizing <span class=\"keyword\">negotiations</span> between employers and employees."
             },
             {
                 id: 9,
-                category: "Functions",
-                question: "What is the role of HR in staff welfare?",
-                answer: "The HR department is responsible for meeting the welfare needs of employees. They monitor the working environment to ensure it is comfortable. They must provide toilets, washing facilities, fresh drinking water, and somewhere clean, hygienic and comfortable for breaks, as well as means of heating food or water for hot drinks."
+                category: "Key Functions",
+                question: "How does HR handle disciplinary procedures?",
+                answer: "Giving formal <span class=\"keyword\">warnings</span> and handling <span class=\"keyword\">dismissal</span> procedures."
             },
             {
                 id: 10,
-                category: "Functions",
-                question: "How does the HR department handle employment issues?",
-                answer: "The HR Department draws up contracts of employment, explains the contents, and ensures that both the employer and employee sign copies. It clarifies pay, hours and place of work, job descriptions, holiday allowances, non-financial incentives, and any other conditions of service for new employees."
+                category: "Key Functions",
+                question: "How does HR manage redundancy?",
+                answer: "Following formal <span class=\"keyword\">redundancy procedures</span>, managing <span class=\"keyword\">redundancy pay</span>, and providing <span class=\"keyword\">written notices</span>."
             },
             {
                 id: 11,
-                category: "Functions",
-                question: "What is the HR department's role in industrial relations?",
-                answer: "The HR department maintains good communications with trade unions. They may also organize and be involved in negotiations between employers and employees."
+                category: "Legal Concepts",
+                question: "What is a contract of employment?",
+                answer: "A <span class=\"keyword\">written agreement</span> between employer and employee that outlines mutual <span class=\"keyword\">obligations</span> and <span class=\"keyword\">rights</span>."
             },
             {
                 id: 12,
-                category: "Functions",
-                question: "How does the HR department handle dismissal?",
-                answer: "The HR department is responsible for giving formal warnings to workers and dealing with any legal requirements when laying off staff. If an employee claims unfair dismissal, the HR department would be involved in the process if the case goes to an employment tribunal."
+                category: "Legal Concepts",
+                question: "What is unfair dismissal?",
+                answer: "<span class=\"keyword\">Illegal termination</span> of employment, such as dismissal for joining a trade union or age discrimination."
             },
             {
                 id: 13,
-                category: "Functions",
-                question: "What is the HR department's role in handling redundancy?",
-                answer: "If a business has to make people redundant, a strict formal procedure has to be followed before they can be laid off. For example, employees must be given written notice and may be entitled to redundancy pay. The HR department handles this process."
+                category: "Legal Concepts",
+                question: "What is an employment tribunal?",
+                answer: "Court that handles <span class=\"keyword\">employer-employee disputes</span> and reviews cases of alleged unfair dismissal."
             },
             {
                 id: 14,
-                category: "Exam",
-                question: "Outline two responsibilities of the HR department related to health and safety. (2 marks)",
-                answer: "1. The HR department must ensure staff are fully trained in health and safety procedures.\n\n2. The HR department must issue all employees with required safety equipment and protective clothing to comply with health and safety legislation."
+                category: "Exam Practice",
+                question: "Outline two HR health and safety responsibilities.",
+                answer: "1. Ensuring staff receive proper <span class=\"keyword\">safety training</span><br><br>2. Providing required <span class=\"keyword\">protective equipment</span>"
             },
             {
                 id: 15,
-                category: "Exam",
-                question: "Explain one reason why workforce planning is important for a large business. (2 marks)",
-                answer: "Workforce planning is important because if a business is short of particular types of staff, it may not be able to meet customer orders (1 mark). This is especially critical in large businesses with thousands of employees, where proper planning ensures operational efficiency (1 mark)."
+                category: "Exam Practice",
+                question: "Why is workforce planning important?",
+                answer: "Proper workforce planning ensures the business has the right staff to <span class=\"keyword\">meet customer orders</span> and maintain <span class=\"keyword\">operational efficiency</span>."
             }
         ];
         
@@ -538,7 +546,7 @@
             
             // Update content
             frontContent.textContent = card.question;
-            backContent.innerHTML = card.answer.replace(/\n\n/g, '<br><br>');
+            backContent.innerHTML = card.answer;
             
             // Update category
             frontCategory.textContent = card.category;
