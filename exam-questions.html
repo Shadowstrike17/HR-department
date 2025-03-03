@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Department Quiz</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -14,6 +13,8 @@
             --card: #ffffff;
             --text: #1e293b;
             --text-light: #64748b;
+            --correct: #10b981;
+            --incorrect: #ef4444;
         }
         
         * {
@@ -28,16 +29,6 @@
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
-        }
-        
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.3;
         }
         
         .navbar {
@@ -75,21 +66,6 @@
             color: var(--primary);
         }
         
-        .btn {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .btn:hover {
-            background-color: #ea580c;
-        }
-        
         .container {
             max-width: 800px;
             margin: 2rem auto;
@@ -125,6 +101,7 @@
             justify-content: center;
             gap: 0.5rem;
             margin-bottom: 2rem;
+            flex-wrap: wrap;
         }
         
         .progress-step {
@@ -137,6 +114,7 @@
             justify-content: center;
             font-weight: 600;
             color: var(--text-light);
+            margin-bottom: 0.5rem;
         }
         
         .progress-step.active {
@@ -144,8 +122,13 @@
             color: white;
         }
         
-        .progress-step.completed {
-            background-color: #10b981;
+        .progress-step.correct {
+            background-color: var(--correct);
+            color: white;
+        }
+        
+        .progress-step.incorrect {
+            background-color: var(--incorrect);
             color: white;
         }
         
@@ -177,6 +160,16 @@
             background-color: #f1f5f9;
         }
         
+        .option.correct {
+            background-color: rgba(16, 185, 129, 0.2);
+            border-color: var(--correct);
+        }
+        
+        .option.incorrect {
+            background-color: rgba(239, 68, 68, 0.2);
+            border-color: var(--incorrect);
+        }
+        
         .option input {
             width: 18px;
             height: 18px;
@@ -190,6 +183,22 @@
         .navigation {
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #ea580c;
         }
         
         .btn-prev {
@@ -199,6 +208,22 @@
         
         .btn-prev:hover {
             background-color: #cbd5e1;
+        }
+        
+        .btn-more {
+            background-color: var(--primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-more:hover {
+            background-color: #1d4ed8;
         }
         
         .result-card {
@@ -219,7 +244,7 @@
         
         .badge {
             padding: 0.5rem 1rem;
-            background-color: #10b981;
+            background-color: var(--correct);
             color: white;
             border-radius: 4px;
             font-weight: 600;
@@ -229,6 +254,15 @@
         
         .hidden {
             display: none;
+        }
+        
+        .explanation {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-left: 4px solid var(--primary);
+            font-style: italic;
+            color: var(--text-light);
         }
         
         @media (max-width: 768px) {
@@ -250,16 +284,11 @@
     </style>
 </head>
 <body>
-    <div id="canvas-container"></div>
-    
     <header class="navbar">
         <div class="logo">HR<span>Quiz</span></div>
         <nav class="nav-links">
             <a href="#" class="nav-link">Home</a>
-            <a href="#" class="nav-link">About</a>
-            <a href="#" class="nav-link">Contact</a>
         </nav>
-        <button class="btn">Start Free</button>
     </header>
     
     <main class="container">
@@ -269,40 +298,23 @@
         </div>
         
         <div class="quiz-card" id="question-container">
-            <div class="progress-bar">
-                <div class="progress-step completed">1</div>
-                <div class="progress-step active">2</div>
-                <div class="progress-step">3</div>
-                <div class="progress-step">4</div>
-                <div class="progress-step">5</div>
-                <div class="progress-step">6</div>
+            <div class="progress-bar" id="progress-bar">
+                <!-- Progress steps will be populated here -->
             </div>
             
             <div class="question-content">
-                <h2 class="question" id="question-text">Which of the following is NOT a primary function of the Human Resources department?</h2>
+                <h2 class="question" id="question-text"></h2>
                 
-                <div class="options">
-                    <label class="option">
-                        <input type="radio" name="q1" value="A">
-                        <span class="option-text">Workforce planning</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q1" value="B">
-                        <span class="option-text">Financial accounting</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q1" value="C">
-                        <span class="option-text">Staff welfare</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="q1" value="D">
-                        <span class="option-text">Recruitment and selection</span>
-                    </label>
+                <div class="options" id="options-container">
+                    <!-- Options will be populated here -->
                 </div>
+                
+                <div class="explanation hidden" id="explanation-box"></div>
             </div>
             
             <div class="navigation">
                 <button class="btn btn-prev" id="prev-btn">Previous</button>
+                <button class="btn btn-more" id="more-btn">M</button>
                 <button class="btn" id="next-btn">Next</button>
             </div>
         </div>
@@ -310,294 +322,390 @@
         <div class="quiz-card hidden" id="result-container">
             <div class="result-card">
                 <h2 class="quiz-title">Quiz Results</h2>
-                <p class="score">4/6</p>
-                <div class="badge">Good Job!</div>
-                <p class="feedback">You have a solid understanding of HR functions! Review the areas where you made mistakes to improve.</p>
+                <p class="score" id="final-score"></p>
+                <div class="badge" id="result-badge"></div>
+                <p class="feedback" id="result-feedback"></p>
                 <button class="btn" id="restart-btn">Try Again</button>
             </div>
         </div>
     </main>
     
     <script>
-        // Three.js background animation
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        container.appendChild(renderer.domElement);
-        
-        // Create floating cubes
-        const cubes = [];
-        const cubeCount = 30;
-        
-        for (let i = 0; i < cubeCount; i++) {
-            const geometry = new THREE.BoxGeometry(1, 1, 1);
-            const material = new THREE.MeshBasicMaterial({ 
-                color: Math.random() * 0xffffff,
-                transparent: true,
-                opacity: 0.3
-            });
-            
-            const cube = new THREE.Mesh(geometry, material);
-            
-            // Random positions
-            cube.position.x = Math.random() * 40 - 20;
-            cube.position.y = Math.random() * 40 - 20;
-            cube.position.z = Math.random() * 40 - 20;
-            
-            // Random rotation speeds
-            cube.rotation.speed = {
-                x: Math.random() * 0.01,
-                y: Math.random() * 0.01,
-                z: Math.random() * 0.01
-            };
-            
-            // Random movement speeds
-            cube.movement = {
-                x: (Math.random() - 0.5) * 0.02,
-                y: (Math.random() - 0.5) * 0.02,
-                z: (Math.random() - 0.5) * 0.02
-            };
-            
-            scene.add(cube);
-            cubes.push(cube);
-        }
-        
-        camera.position.z = 15;
-        
-        // Animation loop
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            cubes.forEach(cube => {
-                // Rotate cubes
-                cube.rotation.x += cube.rotation.speed.x;
-                cube.rotation.y += cube.rotation.speed.y;
-                cube.rotation.z += cube.rotation.speed.z;
-                
-                // Move cubes
-                cube.position.x += cube.movement.x;
-                cube.position.y += cube.movement.y;
-                cube.position.z += cube.movement.z;
-                
-                // Bounce at boundaries
-                if (Math.abs(cube.position.x) > 20) cube.movement.x *= -1;
-                if (Math.abs(cube.position.y) > 20) cube.movement.y *= -1;
-                if (Math.abs(cube.position.z) > 20) cube.movement.z *= -1;
-            });
-            
-            renderer.render(scene, camera);
-        }
-        
-        animate();
-        
-        // Resize handler
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-        
-        // Quiz functionality
-        const questions = [
+        // Define the initial 5 quiz questions
+        const baseQuestions = [
             {
-                question: "Which of the following is NOT a primary function of the Human Resources department?",
+                question: "What is the primary responsibility of the Human Resources (HR) department?",
                 options: [
-                    "Workforce planning",
-                    "Financial accounting",
-                    "Staff welfare",
-                    "Recruitment and selection"
+                    "Managing customer relations",
+                    "Recruiting and managing employees",
+                    "Handling business finances",
+                    "Selling products"
                 ],
-                answer: 1, // Zero-indexed, so 1 is Financial accounting
-                explanation: "Financial accounting is handled by the Finance department, not HR. The HR department is responsible for workforce planning, staff welfare, and recruitment and selection."
+                answer: 1, // Index of correct answer (0-based)
+                explanation: "The HR department is responsible for recruiting, training, and ensuring employee well-being. It does not handle customer relations, finances, or sales."
             },
             {
-                question: "When an employee claims they were dismissed because they joined a trade union, this would be an example of:",
+                question: "What is workforce planning?",
                 options: [
-                    "Legitimate dismissal",
-                    "Redundancy",
-                    "Unfair dismissal",
-                    "Departmental restructuring"
-                ],
-                answer: 2,
-                explanation: "Dismissing an employee for joining a trade union is an example of unfair dismissal, which is illegal and could lead to an employment tribunal case."
-            },
-            {
-                question: "Which of the following tasks is the HR department responsible for handling?",
-                options: [
-                    "Recording financial transactions",
-                    "Developing sales promotions",
-                    "Maintaining machinery",
-                    "Health and safety training"
-                ],
-                answer: 3,
-                explanation: "Health and safety training is a key responsibility of the HR department, ensuring staff are properly trained to comply with health and safety legislation."
-            },
-            {
-                question: "What is the main reason larger businesses are divided into functional departments?",
-                options: [
-                    "To improve cash flow",
-                    "To provide opportunities for specialization",
-                    "To help deal with export orders",
-                    "To reduce communication needs"
+                    "Deciding the price of products",
+                    "Estimating the number and type of employees needed",
+                    "Managing company investments",
+                    "Creating advertisements for job openings"
                 ],
                 answer: 1,
-                explanation: "The main reason for dividing into functional departments is to provide opportunities for specialization, allowing employees to focus on a narrower range of activities with a common purpose."
+                explanation: "Workforce planning involves assessing current and future staffing needs to ensure the business has the right employees in the right roles."
             },
             {
-                question: "Which statement best describes the relationship between departments in a business?",
+                question: "What is the first step in the recruitment process?",
                 options: [
-                    "Departments function independently with minimal communication",
-                    "Only the HR and Finance departments need to communicate regularly",
-                    "Departments are interdependent and must work together",
-                    "Communication between departments is only necessary during crises"
+                    "Conducting interviews",
+                    "Creating job advertisements",
+                    "Hiring employees",
+                    "Training new employees"
                 ],
-                answer: 2,
-                explanation: "Departments are interdependent, meaning they rely on each other for success. Good communication between departments is essential to ensure the business runs effectively."
+                answer: 1,
+                explanation: "Before hiring, HR must advertise the job opening to attract potential candidates. Interviews and training happen later in the process."
             },
             {
-                question: "Which of the following would NOT be handled by the HR department when an employee first joins a company?",
+                question: "Why is employee training important?",
                 options: [
-                    "Organizing induction training",
-                    "Creating a contract of employment",
-                    "Setting up payment of wages",
-                    "Providing health and safety information"
+                    "It helps employees develop skills and improve performance",
+                    "It ensures employees get promoted quickly",
+                    "It allows HR to track employee attendance",
+                    "It increases product prices"
                 ],
-                answer: 2,
-                explanation: "Setting up payment of wages is primarily a Finance department responsibility. The HR department would handle induction training, employment contracts, and health and safety information."
+                answer: 0,
+                explanation: "Training enhances employee skills, making them more efficient and productive in their roles."
+            },
+            {
+                question: "What is the HR department's role in workplace health and safety?",
+                options: [
+                    "Creating company logos",
+                    "Ensuring employees have a safe working environment",
+                    "Deciding employee salaries",
+                    "Managing customer complaints"
+                ],
+                answer: 1,
+                explanation: "HR ensures compliance with health and safety laws, provides protective equipment, and trains employees on safety protocols."
             }
         ];
         
+        // Define the extra 5 questions that appear when clicking "M"
+        const extraQuestions = [
+            {
+                question: "What must an employment contract include?",
+                options: [
+                    "The employee's personal hobbies",
+                    "Salary, job role, and working hours",
+                    "The employee's favorite color",
+                    "Customer reviews about the company"
+                ],
+                answer: 1,
+                explanation: "An employment contract defines the terms of employment, including pay, job responsibilities, and work schedule."
+            },
+            {
+                question: "Why is maintaining good industrial relations important for HR?",
+                options: [
+                    "To ensure employees remain productive and disputes are handled fairly",
+                    "To help employees find new jobs",
+                    "To reduce the company's marketing costs",
+                    "To make customers feel more valued"
+                ],
+                answer: 0,
+                explanation: "Good industrial relations help prevent conflicts between employees and employers, ensuring a stable and productive work environment."
+            },
+            {
+                question: "What happens if an employee has a grievance at work?",
+                options: [
+                    "They must immediately quit their job",
+                    "They should report the issue to the HR department",
+                    "They have to solve it on their own",
+                    "They should stop working until the issue is resolved"
+                ],
+                answer: 1,
+                explanation: "The HR department is responsible for handling employee complaints (grievances) and resolving conflicts fairly."
+            },
+            {
+                question: "What is the difference between dismissal and redundancy?",
+                options: [
+                    "Dismissal is when an employee is fired for misconduct, while redundancy occurs when their job is no longer needed",
+                    "Dismissal is voluntary, but redundancy is forced",
+                    "There is no difference",
+                    "Redundancy is when an employee quits on their own"
+                ],
+                answer: 0,
+                explanation: "Dismissal happens when an employee is terminated for poor behavior or performance. Redundancy occurs when a job position is removed due to company needs."
+            },
+            {
+                question: "Why is communication between HR and other departments important?",
+                options: [
+                    "To ensure employees are paid on time and have proper contracts",
+                    "To decide what products the company should sell",
+                    "To increase the company's social media followers",
+                    "To handle customer service complaints"
+                ],
+                answer: 0,
+                explanation: "HR works closely with the finance department for payroll and contracts, as well as other departments to manage workforce needs and compliance."
+            }
+        ];
+        
+        // Quiz state variables
+        let questions = [...baseQuestions]; // Start with base 5 questions
         let currentQuestion = 0;
         let score = 0;
         let answers = [];
+        let extraQuestionsAdded = false;
         
+        // DOM elements
         const questionText = document.getElementById('question-text');
-        const options = document.querySelectorAll('.option');
+        const optionsContainer = document.getElementById('options-container');
+        const explanationBox = document.getElementById('explanation-box');
         const nextBtn = document.getElementById('next-btn');
         const prevBtn = document.getElementById('prev-btn');
+        const moreBtn = document.getElementById('more-btn');
         const questionContainer = document.getElementById('question-container');
         const resultContainer = document.getElementById('result-container');
         const restartBtn = document.getElementById('restart-btn');
-        const progressSteps = document.querySelectorAll('.progress-step');
+        const progressBar = document.getElementById('progress-bar');
+        const finalScore = document.getElementById('final-score');
+        const resultBadge = document.getElementById('result-badge');
+        const resultFeedback = document.getElementById('result-feedback');
         
-        // Initialize with first question
+        // Initialize quiz with first question
         loadQuestion(0);
+        updateProgressBar();
         
+        // Function to load question at specified index
         function loadQuestion(index) {
-            // Update question
+            // Update question text
             questionText.textContent = questions[index].question;
             
-            // Update options
-            const optionElements = document.querySelectorAll('.option-text');
-            for (let i = 0; i < optionElements.length; i++) {
-                optionElements[i].textContent = questions[index].options[i];
+            // Clear previous options and explanation
+            optionsContainer.innerHTML = '';
+            explanationBox.innerHTML = '';
+            explanationBox.classList.add('hidden');
+            
+            // Create option elements
+            for (let i = 0; i < questions[index].options.length; i++) {
+                const optionLabel = document.createElement('label');
+                optionLabel.className = 'option';
+                
+                const radioInput = document.createElement('input');
+                radioInput.type = 'radio';
+                radioInput.name = 'q1';
+                radioInput.value = String.fromCharCode(65 + i); // A, B, C, D
+                
+                const optionText = document.createElement('span');
+                optionText.className = 'option-text';
+                optionText.textContent = questions[index].options[i];
+                
+                optionLabel.appendChild(radioInput);
+                optionLabel.appendChild(optionText);
+                optionsContainer.appendChild(optionLabel);
+                
+                // If this question has already been answered, show feedback
+                if (answers[index] !== undefined) {
+                    radioInput.disabled = true;
+                    
+                    // Check the selected answer
+                    if (i === answers[index]) {
+                        radioInput.checked = true;
+                        
+                        // Apply correct/incorrect styling
+                        if (answers[index] === questions[index].answer) {
+                            optionLabel.classList.add('correct');
+                        } else {
+                            optionLabel.classList.add('incorrect');
+                        }
+                    }
+                    
+                    // Always highlight the correct answer if the user got it wrong
+                    if (i === questions[index].answer && answers[index] !== questions[index].answer) {
+                        const correctOption = document.createElement('label');
+                        correctOption.className = 'option correct';
+                        
+                        const correctRadio = document.createElement('input');
+                        correctRadio.type = 'radio';
+                        correctRadio.name = 'q1-correct';
+                        correctRadio.disabled = true;
+                        
+                        const correctText = document.createElement('span');
+                        correctText.className = 'option-text';
+                        correctText.textContent = questions[index].options[i] + ' (Correct answer)';
+                        
+                        correctOption.appendChild(correctRadio);
+                        correctOption.appendChild(correctText);
+                        optionsContainer.appendChild(correctOption);
+                    }
+                    
+                    // Show explanation
+                    explanationBox.textContent = questions[index].explanation;
+                    explanationBox.classList.remove('hidden');
+                }
             }
             
-            // Check if this question has been answered before
-            const radioInputs = document.querySelectorAll('input[type="radio"]');
-            radioInputs.forEach(input => input.checked = false);
-            
-            if (answers[index] !== undefined) {
-                radioInputs[answers[index]].checked = true;
-            }
-            
-            // Update buttons
+            // Update navigation buttons
             prevBtn.disabled = index === 0;
             prevBtn.style.opacity = index === 0 ? 0.5 : 1;
             
-            if (index === questions.length - 1) {
-                nextBtn.textContent = "Finish";
-            } else {
-                nextBtn.textContent = "Next";
-            }
-            
-            // Update progress bar
-            progressSteps.forEach((step, i) => {
-                step.classList.remove('active', 'completed');
-                if (i < index) {
-                    step.classList.add('completed');
-                } else if (i === index) {
-                    step.classList.add('active');
-                }
-            });
+            nextBtn.textContent = index === questions.length - 1 ? "Finish" : "Next";
             
             // Update current question
             currentQuestion = index;
         }
         
-        nextBtn.addEventListener('click', () => {
-            // Save answer for current question
-            const selectedOption = document.querySelector(`input[name="q1"]:checked`);
+        // Function to update the progress bar
+        function updateProgressBar() {
+            // Clear existing progress steps
+            progressBar.innerHTML = '';
             
-            if (selectedOption) {
-                const answer = Array.from(options).findIndex(option => 
-                    option.querySelector('input') === selectedOption);
-                answers[currentQuestion] = answer;
+            // Create progress steps for all questions
+            for (let i = 0; i < questions.length; i++) {
+                const step = document.createElement('div');
+                step.textContent = i + 1;
+                step.className = 'progress-step';
                 
-                if (answer === questions[currentQuestion].answer) {
-                    score++;
+                if (i === currentQuestion) {
+                    step.classList.add('active');
+                } else if (answers[i] !== undefined) {
+                    // If the question has been answered, show correct or incorrect
+                    if (answers[i] === questions[i].answer) {
+                        step.classList.add('correct');
+                    } else {
+                        step.classList.add('incorrect');
+                    }
+                }
+                
+                progressBar.appendChild(step);
+            }
+        }
+        
+        // Next button event handler
+        nextBtn.addEventListener('click', () => {
+            // If this question hasn't been answered yet
+            if (answers[currentQuestion] === undefined) {
+                const selectedOption = document.querySelector('input[name="q1"]:checked');
+                
+                if (selectedOption) {
+                    // Find index of selected option
+                    const optionElements = document.querySelectorAll('.option');
+                    const selectedIndex = Array.from(optionElements).findIndex(
+                        option => option.querySelector('input') === selectedOption
+                    );
+                    
+                    // Record answer
+                    answers[currentQuestion] = selectedIndex;
+                    
+                    // Apply styling for correct/incorrect
+                    const options = document.querySelectorAll('.option');
+                    const isCorrect = selectedIndex === questions[currentQuestion].answer;
+                    
+                    options[selectedIndex].classList.add(isCorrect ? 'correct' : 'incorrect');
+                    
+                    // If correct, increase score
+                    if (isCorrect) {
+                        score++;
+                    } else {
+                        // If incorrect, show the correct answer
+                        options[questions[currentQuestion].answer].classList.add('correct');
+                    }
+                    
+                    // Disable all options
+                    document.querySelectorAll('input[name="q1"]').forEach(input => {
+                        input.disabled = true;
+                    });
+                    
+                    // Show explanation
+                    explanationBox.textContent = questions[currentQuestion].explanation;
+                    explanationBox.classList.remove('hidden');
+                    
+                    // Update progress bar to reflect the answer
+                    updateProgressBar();
+                } else {
+                    // Require an answer
+                    alert("Please select an answer before proceeding.");
+                    return;
                 }
             }
             
+            // If this is the last question, show results
             if (currentQuestion === questions.length - 1) {
-                // Show results
                 showResults();
             } else {
                 // Go to next question
                 loadQuestion(currentQuestion + 1);
+                updateProgressBar();
             }
         });
         
+        // Previous button event handler
         prevBtn.addEventListener('click', () => {
             if (currentQuestion > 0) {
                 loadQuestion(currentQuestion - 1);
+                updateProgressBar();
             }
         });
         
+        // "M" button to add extra questions
+        moreBtn.addEventListener('click', () => {
+            if (!extraQuestionsAdded) {
+                questions = [...baseQuestions, ...extraQuestions];
+                extraQuestionsAdded = true;
+                moreBtn.style.display = 'none';
+                updateProgressBar();
+                alert("5 additional questions have been added to the quiz!");
+            }
+        });
+        
+        // Restart button event handler
         restartBtn.addEventListener('click', () => {
-            // Reset quiz
+            // Reset quiz state
             currentQuestion = 0;
             score = 0;
             answers = [];
-            loadQuestion(0);
+            extraQuestionsAdded = false;
+            questions = [...baseQuestions];
             
-            // Show question container
+            // Show M button again
+            moreBtn.style.display = 'block';
+            
+            // Load first question
+            loadQuestion(0);
+            updateProgressBar();
+            
+            // Show question container, hide results
             questionContainer.classList.remove('hidden');
             resultContainer.classList.add('hidden');
         });
         
+        // Function to show quiz results
         function showResults() {
             questionContainer.classList.add('hidden');
             resultContainer.classList.remove('hidden');
             
-            // Update score
-            document.querySelector('.score').textContent = `${score}/${questions.length}`;
+            // Update score display
+            finalScore.textContent = `${score}/${questions.length}`;
             
-            // Update feedback
-            const feedback = document.querySelector('.feedback');
-            const badge = document.querySelector('.badge');
-            
+            // Calculate percentage
             const percentage = (score / questions.length) * 100;
             
+            // Set badge and feedback based on score
             if (percentage >= 85) {
-                badge.textContent = "Excellent!";
-                badge.style.backgroundColor = "#10b981";
-                feedback.textContent = "You have an excellent understanding of HR functions and responsibilities!";
+                resultBadge.textContent = "Excellent!";
+                resultBadge.style.backgroundColor = "#10b981";
+                resultFeedback.textContent = "You have an excellent understanding of HR functions and responsibilities!";
             } else if (percentage >= 70) {
-                badge.textContent = "Good Job!";
-                badge.style.backgroundColor = "#3b82f6";
-                feedback.textContent = "You have a solid understanding of HR functions! Review the areas where you made mistakes to improve.";
+                resultBadge.textContent = "Good Job!";
+                resultBadge.style.backgroundColor = "#3b82f6";
+                resultFeedback.textContent = "You have a solid understanding of HR functions! Review the areas where you made mistakes to improve.";
             } else if (percentage >= 50) {
-                badge.textContent = "Not Bad";
-                badge.style.backgroundColor = "#f59e0b";
-                feedback.textContent = "You have a basic understanding of HR functions. Consider reviewing the material to strengthen your knowledge.";
+                resultBadge.textContent = "Not Bad";
+                resultBadge.style.backgroundColor = "#f59e0b";
+                resultFeedback.textContent = "You have a basic understanding of HR functions. Consider reviewing the material to strengthen your knowledge.";
             } else {
-                badge.textContent = "Needs Improvement";
-                badge.style.backgroundColor = "#ef4444";
-                feedback.textContent = "You might need to revisit the HR functions section of your textbook. Don't worry, with more study you'll improve!";
+                resultBadge.textContent = "Needs Improvement";
+                resultBadge.style.backgroundColor = "#ef4444";
+                resultFeedback.textContent = "You might need to revisit the HR functions section of your textbook. Don't worry, with more study you'll improve!";
             }
         }
     </script>
